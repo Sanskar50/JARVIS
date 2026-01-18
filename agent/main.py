@@ -5,21 +5,20 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agent.agent_controller import AgentController
-from agent.observability.tracing import logger
+
 
 def main():
-    logger.info("Starting Agent Application...")
+    print("Starting Agent Application...")
     controller = AgentController()
-    
     # Example usage
     try:
         controller.run()
-        # In a real loop, you might accept input from CLI or API
-        response = controller.process_request("Hello Agent")
+        response = controller.get_aqi("Lucknow")
         print(response)
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
+        print(f"An error occurred: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

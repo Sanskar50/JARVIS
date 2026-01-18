@@ -4,10 +4,12 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+
 class Config:
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4")
-    DB_CONNECTION_STRING = os.getenv("DB_CONNECTION_STRING", "sqlite:///agent.db")
-    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME")
+    WEATHER_API_BASE_URL = os.getenv("WEATHER_API_BASE_URL")
+    API_KEY = os.getenv("API_KEY")
+
 
 config = Config()

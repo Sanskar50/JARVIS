@@ -91,6 +91,14 @@ python main.py
 
 ---
 
+### 5. Inference
+
+<img width="714" height="219" alt="image" src="https://github.com/user-attachments/assets/29e6938f-c8f0-421e-b7d0-0cd5db60eaaa" />
+<img width="1620" height="626" alt="image" src="https://github.com/user-attachments/assets/6f191580-5db3-44ad-80a7-8d7f7b5ed4b7" />
+
+
+
+
 ## 🛣️ Roadmap
 - [ ] Add support for persistent memory/history.
 - [ ] Implement more tools (Calendar, Email, Search).

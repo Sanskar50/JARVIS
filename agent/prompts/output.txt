@@ -1,0 +1,13 @@
+Output MUST be ONLY a valid JSON.
+Do NOT include markdown, tables, or text.
+
+Return a JSON array of objects
+
+Rules (STRICT):
+- Do NOT include any introductory text
+- Do NOT include explanations
+- Do NOT include headings
+- Do NOT include bullet points
+- Do NOT include closing text
+- Use API results available use them for populating data and for key names in JSON else use self general knowledge
+- If you output anything outside the JSON, the answer is INVALID

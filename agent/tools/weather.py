@@ -1,13 +1,15 @@
-from agent.schemas.tools import WeatherToolInput
+import requests
+from agent.config import config
 
-def get_weather(input_data: WeatherToolInput):
+
+def get_weather(input_data: {"location": "Bengaluru"}):
     """
-    Mock function to get weather data.
+    function to get temperature data.
     """
-    # In a real app, this would call an API
-    return {
-        "location": input_data.location,
-        "temperature": 22,
-        "unit": input_data.unit,
-        "condition": "Sunny"
-    }
+    try:
+        url = f"{config.WEATHER_API_BASE_URL}/forecast.json?key={config.API_KEY}&q={input_data['location']}"
+        response = requests.get(url)
+        weather_data = response.json()
+        return f"{input_data['location']}: {weather_data['current']['condition']['text']}"
+    except Exception as e:
+        return str(e)

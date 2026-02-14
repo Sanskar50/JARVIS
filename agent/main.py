@@ -5,21 +5,24 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agent.agent_controller import AgentController
-from agent.observability.tracing import logger
+
 
 def main():
-    logger.info("Starting Agent Application...")
+    print("Starting Agent Application...")
     controller = AgentController()
-    
     # Example usage
     try:
         controller.run()
-        # In a real loop, you might accept input from CLI or API
-        response = controller.process_request("Hello Agent")
-        print(response)
+        print(
+            "I am a JARVIS an AI Assistant. I can help you with your queries.\nEnter your query:"
+        )
+        user_input = input()
+        response = controller.process_request(user_input)
+        print(f"\n{response}")
     except Exception as e:
-        logger.error(f"An error occurred: {e}")
+        print(f"An error occurred: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

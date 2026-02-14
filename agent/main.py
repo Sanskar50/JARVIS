@@ -13,8 +13,12 @@ def main():
     # Example usage
     try:
         controller.run()
-        response = controller.get_aqi("Lucknow")
-        print(response)
+        print(
+            "I am a JARVIS an AI Assistant. I can help you with your queries.\nEnter your query:"
+        )
+        user_input = input()
+        response = controller.process_request(user_input)
+        print(f"\n{response}")
     except Exception as e:
         print(f"An error occurred: {e}")
         sys.exit(1)

@@ -19,6 +19,6 @@ def get_aqi(input_data: WebSearchInput):
         url = f"{config.WEATHER_API_BASE_URL}/forecast.json?key={config.API_KEY}&q={input_data['location']}&aqi=yes"
         response = requests.get(url)
         aqi_data = response.json()
-        return {aqi_data["current"]["air_quality"]["us-epa-index"]:mapping[aqi_data["current"]["air_quality"]["us-epa-index"]]}
+        return f"{input_data['location']}: {aqi_data['current']['air_quality']['us-epa-index']}: {mapping[aqi_data['current']['air_quality']['us-epa-index']]}"
     except Exception as e:
         return str(e)

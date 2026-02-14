@@ -10,6 +10,6 @@ def get_weather(input_data: {"location": "Bengaluru"}):
         url = f"{config.WEATHER_API_BASE_URL}/forecast.json?key={config.API_KEY}&q={input_data['location']}"
         response = requests.get(url)
         weather_data = response.json()
-        return weather_data["current"]["condition"]["text"]
+        return f"{input_data['location']}: {weather_data['current']['condition']['text']}"
     except Exception as e:
         return str(e)

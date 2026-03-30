@@ -173,3 +173,8 @@ agent/logs/
 agent/temp/
 agent/local_config.py
 agent/venv/
+
+# Gmail API files
+langchain_agent/credentials.json
+langchain_agent/token.json
+

@@ -1,0 +1,14 @@
+langchain
+langchain-community
+langchain-google-genai
+langchain-core
+langgraph
+python-dotenv
+google-generativeai
+fastapi
+uvicorn
+httpx
+google-api-python-client 
+google-auth-httplib2 
+google-auth-oauthlib
+

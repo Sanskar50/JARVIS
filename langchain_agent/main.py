@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request
+import os
 import uvicorn
 import logging
 from telegram_webhook import telegram_webhook, send_message
 from agent import ask_agent
+from fastapi import FastAPI, Request
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -29,4 +30,5 @@ async def root():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

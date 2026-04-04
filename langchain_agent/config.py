@@ -11,6 +11,10 @@ class Config:
     WEATHER_API_BASE_URL = os.getenv("WEATHER_API_BASE_URL")
     API_KEY = os.getenv("API_KEY")
     TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+    GMAIL_TOKEN = os.getenv("GMAIL_TOKEN")
+    GMAIL_REFRESH_TOKEN = os.getenv("GMAIL_REFRESH_TOKEN")
+    GMAIL_CLIENT_ID = os.getenv("GMAIL_CLIENT_ID")
+    GMAIL_CLIENT_SECRET = os.getenv("GMAIL_CLIENT_SECRET")
 
 
 config = Config()

@@ -15,6 +15,7 @@ class Config:
     GMAIL_REFRESH_TOKEN = os.getenv("GMAIL_REFRESH_TOKEN")
     GMAIL_CLIENT_ID = os.getenv("GMAIL_CLIENT_ID")
     GMAIL_CLIENT_SECRET = os.getenv("GMAIL_CLIENT_SECRET")
+    TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 
 config = Config()

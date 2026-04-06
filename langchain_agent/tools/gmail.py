@@ -1,4 +1,5 @@
 import base64
+import re
 from email.message import EmailMessage
 from config import config
 from google.auth.transport.requests import Request
@@ -35,7 +36,7 @@ def get_gmail_service():
     return build("gmail", "v1", credentials=creds)
 
 
-def gmail_read(max_results: int = 10):
+def gmail_read(max_results: int = 20):
     """
     List the user's most recent emails.
     Returns: A list of dicts with subject and snippet.
@@ -59,8 +60,17 @@ def gmail_read(max_results: int = 10):
                 (h["value"] for h in headers if h["name"].lower() == "subject"),
                 "No Subject",
             )
+            sender = next(
+                (h["value"] for h in headers if h["name"].lower() == "from"),
+                "Unknown",
+            )
             email_data.append(
-                {"id": msg["id"], "subject": subject, "snippet": txt.get("snippet", "")}
+                {
+                    "id": msg["id"],
+                    "subject": subject,
+                    "sender": sender,
+                    "snippet": txt.get("snippet", ""),
+                }
             )
         return email_data
     except HttpError as error:
@@ -115,7 +125,7 @@ def gmail_draft(to: str, subject: str, body: str):
         return f"An error occurred: {error}"
 
 
-def gmail_read_by_label(label_id: str, max_results: int = 10):
+def gmail_read_by_label(label_id: str, max_results: int = 20):
     """
     List the user's emails from a specific label (e.g., 'IMPORTANT', 'SENT', 'INBOX').
     Returns: A list of dicts with subject and snippet.
@@ -139,9 +149,55 @@ def gmail_read_by_label(label_id: str, max_results: int = 10):
                 (h["value"] for h in headers if h["name"].lower() == "subject"),
                 "No Subject",
             )
+            sender = next(
+                (h["value"] for h in headers if h["name"].lower() == "from"),
+                "Unknown",
+            )
             email_data.append(
-                {"id": msg["id"], "subject": subject, "snippet": txt.get("snippet", "")}
+                {
+                    "id": msg["id"],
+                    "subject": subject,
+                    "sender": sender,
+                    "snippet": txt.get("snippet", ""),
+                }
             )
         return email_data
+    except HttpError as error:
+        return f"An error occurred: {error}"
+
+
+def gmail_get_email_addresses(max_results: int = 20):
+    """
+    Extract unique email addresses from the most recent emails.
+    """
+    try:
+        service = get_gmail_service()
+        results = (
+            service.users()
+            .messages()
+            .list(userId="me", maxResults=max_results)
+            .execute()
+        )
+        messages = results.get("messages", [])
+
+        email_regex = r"[\w\.-]+@[\w\.-]+\.\w+"
+        addresses = set()
+        for msg in messages:
+            txt = (
+                service.users()
+                .messages()
+                .get(userId="me", id=msg["id"], format="metadata")
+                .execute()
+            )
+            headers = txt.get("payload", {}).get("headers", [])
+            sender = next(
+                (h["value"] for h in headers if h["name"].lower() == "from"),
+                "",
+            )
+            found = re.findall(email_regex, sender)
+            for addr in found:
+                addresses.add(addr)
+
+        return list(addresses)
     except HttpError as error:
         return f"An error occurred: {error}"

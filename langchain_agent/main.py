@@ -29,6 +29,18 @@ async def root():
     return {"status": "JARVIS Agent is online."}
 
 
+def test_run():
+    """Test the JARVIS agent in an interactive loop."""
+    print("Welcome to JARVIS Test Mode. Type 'exit' to quit.")
+    while True:
+        query = input("Enter your query: ")
+        if query.lower() in ["exit", "quit", "q"]:
+            break
+        print(f"JARVIS: {ask_agent(query)}")
+
+
 if __name__ == "__main__":
+    # if os.getenv("TEST_MODE","true") == "true":
+    #     test_run()
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

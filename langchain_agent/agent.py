@@ -3,12 +3,28 @@ from langchain.tools import tool
 from langchain.agents import create_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
 from config import config
-from tools.gmail import gmail_read, gmail_send, gmail_draft, gmail_read_by_label
+from tools.gmail import (
+    gmail_read,
+    gmail_send,
+    gmail_draft,
+    gmail_read_by_label,
+    gmail_get_email_addresses,
+)
+from tools.web_search import web_search as run_web_search
 
 # Load system prompt from file
 prompt_path = os.path.join(os.path.dirname(__file__), "prompts", "system_prompt.txt")
 with open(prompt_path, "r", encoding="utf-8") as f:
     system_prompt = f.read().strip()
+
+
+@tool
+def web_search(query: str):
+    """
+    Search the web for the given query.
+    Returns: A list of dicts with title, url, and snippet.
+    """
+    return run_web_search(query)
 
 
 @tool
@@ -45,6 +61,14 @@ def read_emails_by_label(label_id: str, max_results: int = 10):
     return gmail_read_by_label(label_id, max_results)
 
 
+@tool
+def get_email_addresses(max_results: int = 20):
+    """
+    Extract unique email addresses from the most recent emails.
+    """
+    return gmail_get_email_addresses(max_results)
+
+
 model = ChatGoogleGenerativeAI(
     model=config.GEMINI_MODEL_NAME,
     google_api_key=config.GEMINI_API_KEY,
@@ -53,7 +77,14 @@ model = ChatGoogleGenerativeAI(
 
 agent = create_agent(
     model,
-    tools=[read_emails, send_emails, draft_email, read_emails_by_label],
+    tools=[
+        web_search,
+        read_emails,
+        send_emails,
+        draft_email,
+        read_emails_by_label,
+        get_email_addresses,
+    ],
     system_prompt=system_prompt,
 )
 

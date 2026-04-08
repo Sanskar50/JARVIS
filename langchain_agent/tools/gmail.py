@@ -7,7 +7,6 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# If modifying these scopes, delete the file token.json.
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.modify",
@@ -16,22 +15,25 @@ SCOPES = [
 
 def get_gmail_service():
     """Helper to get an authorized Gmail API service instance."""
-    info = {
-        "token": config.GMAIL_TOKEN,
-        "refresh_token": config.GMAIL_REFRESH_TOKEN,
-        "token_uri": "https://oauth2.googleapis.com/token",
-        "client_id": config.GMAIL_CLIENT_ID,
-        "client_secret": config.GMAIL_CLIENT_SECRET,
-        "scopes": SCOPES,
-        "universe_domain": "googleapis.com",
-        "account": "",
-        "expiry": "2026-04-04T07:05:58.391207Z",
-    }
-    creds = Credentials.from_authorized_user_info(info, SCOPES)
+    token = config.GMAIL_TOKEN if config.GMAIL_TOKEN else None
+    refresh_token = config.GMAIL_REFRESH_TOKEN if config.GMAIL_REFRESH_TOKEN else None
+    client_id = config.GMAIL_CLIENT_ID if config.GMAIL_CLIENT_ID else None
+    client_secret = config.GMAIL_CLIENT_SECRET if config.GMAIL_CLIENT_SECRET else None
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
+    creds = Credentials(
+        token=token,
+        refresh_token=refresh_token,
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=client_id,
+        client_secret=client_secret,
+        scopes=SCOPES,
+    )
+
+    if not creds.valid and creds.refresh_token:
+        try:
             creds.refresh(Request())
+        except Exception as e:
+            print(f"Warning: Token refresh failed: {e}")
 
     return build("gmail", "v1", credentials=creds)
 

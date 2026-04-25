@@ -1,11 +1,17 @@
 import base64
 import re
+import os
 from email.message import EmailMessage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
 from config import config
+from sources.template import SUBJECT, BODY
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from google.auth.exceptions import RefreshError
 
 SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
@@ -77,6 +83,8 @@ def gmail_read(max_results: int = 20):
         return email_data
     except HttpError as error:
         return f"An error occurred: {error}"
+    except RefreshError:
+        return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
 def gmail_send(to: str, subject: str, body: str):
@@ -101,6 +109,76 @@ def gmail_send(to: str, subject: str, body: str):
         return f'Message Id: {send_message["id"]} sent successfully.'
     except HttpError as error:
         return f"An error occurred: {error}"
+    except RefreshError:
+        return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
+
+
+def gmail_send_with_resume(to: str, company_name: str, first_name: str):
+    """
+    Send an email with the resume attached using the predefined template.
+    """
+    try:
+        service = get_gmail_service()
+        send_as_results = (
+            service.users().settings().sendAs().list(userId="me").execute()
+        )
+        send_as_info = next(
+            (
+                info
+                for info in send_as_results.get("sendAs", [])
+                if info.get("isDefault")
+            ),
+            send_as_results.get("sendAs", [{}])[0],
+        )
+        signature = send_as_info.get("signature", "")
+
+        message = MIMEMultipart()
+        message["To"] = to
+        message["From"] = "me"
+        message["Subject"] = SUBJECT.format(
+            company_name=company_name, first_name=first_name
+        )
+
+        # Combine body and signature
+        formatted_body = BODY.format(first_name=first_name)
+        if signature:
+            if "<" in signature or "&" in signature:  # Simple check for HTML
+                html_body = formatted_body.replace("\n", "<br>")
+                full_body = f"<div>{html_body}</div><br>{signature}"
+                message.attach(MIMEText(full_body, "html"))
+            else:
+                full_body = f"{formatted_body}\n\n{signature}"
+                message.attach(MIMEText(full_body, "plain"))
+        else:
+            message.attach(MIMEText(formatted_body, "plain"))
+
+        # Attach the resume
+        file_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            "sources",
+            "Sanskar_Suri_Resume.pdf",
+        )
+        if os.path.exists(file_path):
+            with open(file_path, "rb") as f:
+                part = MIMEApplication(f.read(), Name="Sanskar_Suri_Resume.pdf")
+            part["Content-Disposition"] = (
+                'attachment; filename="Sanskar_Suri_Resume.pdf"'
+            )
+            message.attach(part)
+        else:
+            return f"Error: Resume file not found at {file_path}."
+
+        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+        create_message = {"raw": encoded_message}
+
+        send_message = (
+            service.users().messages().send(userId="me", body=create_message).execute()
+        )
+        return f'Message Id: {send_message["id"]} sent successfully with resume.'
+    except HttpError as error:
+        return f"An error occurred: {error}"
+    except RefreshError:
+        return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
 def gmail_draft(to: str, subject: str, body: str):
@@ -125,6 +203,8 @@ def gmail_draft(to: str, subject: str, body: str):
         return f'Draft Id: {draft["id"]} created successfully.'
     except HttpError as error:
         return f"An error occurred: {error}"
+    except RefreshError:
+        return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
 def gmail_read_by_label(label_id: str, max_results: int = 20):
@@ -166,6 +246,8 @@ def gmail_read_by_label(label_id: str, max_results: int = 20):
         return email_data
     except HttpError as error:
         return f"An error occurred: {error}"
+    except RefreshError:
+        return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
 def gmail_get_email_addresses(max_results: int = 20):
@@ -203,3 +285,5 @@ def gmail_get_email_addresses(max_results: int = 20):
         return list(addresses)
     except HttpError as error:
         return f"An error occurred: {error}"
+    except RefreshError:
+        return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."

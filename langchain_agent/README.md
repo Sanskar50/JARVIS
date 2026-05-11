@@ -1,35 +1,32 @@
-# JARVIS: Agentic AI Recruitment Assistant
+# JARVIS: Agentic AI Framework
 
-JARVIS is a state-of-the-art AI agent designed to automate the professional recruitment outreach process. Built using **LangChain** and powered by **Google Gemini**, JARVIS can autonomously search the web, identify professional contact information, and send personalized recruitment emails with resume attachments.
+JARVIS is a modular Agentic AI system built on **LangChain** and **Google Gemini**. It leverages a multi-tool architecture to bridge the gap between Large Language Models and real-world enterprise integrations, including Google Workspace, professional data APIs, and real-time web intelligence.
 
-## 🚀 Key Features
+## 🏗️ Core Architecture
 
-- **Autonomous Contact Discovery**: Converts LinkedIn URLs into verified professional email addresses using a combination of web search and the Hunter.io API.
-- **Smart Gmail Integration**: 
-    - Full inbox management (Read, Send, Draft).
-    - **Resume Attachment**: Sends a predefined resume PDF with one command.
-    - **Dynamic Templates**: Uses HSL-tailored email templates with automatic name and company population.
-    - **Auto-Signature**: Fetches your real Gmail signature (HTML or Plain) and appends it to outgoing emails.
-- **Resilient Architecture**: Implements a robust fallback mechanism that automatically switches to a secondary model (e.g., Gemini Flash) if the primary model (Gemini Pro) experiences downtime (503) or rate limits.
-- **Interactive Interface**: Supports both a FastAPI-powered web backend and a local CLI test mode.
+The system is designed with a **decoupled tool-calling architecture**, allowing the LLM to act as a reasoning engine that orchestrates complex workflows across multiple external services.
 
-## 🏗️ Architecture Overview
+### 1. Reasoning & Orchestration (`agent.py`)
+- **Model Agnostic Framework**: Uses LangChain's `create_agent` to manage state and tool execution.
+- **Resilient Model Fallback**: Implements an automated failover strategy using `.with_fallbacks()`. If the primary model encounters a `503 Service Unavailable` or `429 Rate Limit`, the system automatically re-routes the request to a secondary model without losing context.
+- **Dynamic Prompting**: System instructions are externalized in `prompts/system_prompt.txt`, allowing for rapid iteration of agent behavior.
 
-The system is modularized into several core components:
+### 2. Service Integrations (`tools/`)
+The agent's capabilities are extended via a suite of specialized Python-based tools:
 
-### 1. Agent Orchestration (`agent.py`)
-The "brain" of JARVIS. It initializes the **Gemini 3.1** models and binds them to a suite of specialized tools. It uses LangChain's `create_agent` for complex reasoning and tool selection.
+#### 📬 Google Workspace Integration (`gmail.py`)
+- **OAuth2 Lifecycle**: Managed via `generate_token.py`, supporting automated token refreshing to prevent `invalid_grant` errors.
+- **Bi-Directional Communication**: Support for listing, reading, drafting, and sending emails.
+- **Advanced MIME Support**: Programmatically handles attachments (PDF/Images) and constructs multi-part messages.
+- **Contextual Awareness**: Dynamically fetches the user's authentic Gmail signature (HTML/Plain) via `service.users().settings()` to ensure outgoing communications match the user's professional identity.
 
-### 2. Tool Suite (`tools/`)
-- **`gmail.py`**: A high-level wrapper around the Google Gmail API. It handles OAuth2 token refreshing and complex MIME message construction for attachments and signatures.
-- **`find_email.py`**: Interfaces with the **Hunter.io API** to perform professional email lookups based on name and domain.
-- **`web_search.py`**: Powered by **Tavily**, allowing the agent to research companies and LinkedIn profiles in real-time.
+#### 🔍 Professional Intelligence (`find_email.py`)
+- **Hunter.io Integration**: Programmatic lookup of professional contact information using domain-based discovery patterns.
+- **Data Verification**: Extracts verified email addresses, confidence scores, and source tracking.
 
-### 3. Core Logic & API (`main.py`)
-A **FastAPI** application that serves as the entry point. It handles asynchronous requests and provides a `test_run` loop for developers to interact with the agent locally.
-
-### 4. Configuration (`config.py` & `.env`)
-Centralized management of secrets (API Keys, OAuth Tokens) and model parameters.
+#### 🌐 Web Intelligence (`web_search.py`)
+- **Tavily API**: Real-time web crawling and search optimization.
+- **Context Injection**: Allows the agent to research real-time data (LinkedIn profiles, company domains, news) to inform subsequent tool calls.
 
 ## 📂 File Structure
 
@@ -47,8 +44,7 @@ langchain_agent/
 ├── agent.py                # Agent initialization & tool binding
 ├── main.py                 # FastAPI app & CLI entry point
 ├── config.py               # Env var management
-├── .env                    # Secrets (API Keys, Models)
-└── generate_token.py       # Helper script for Gmail OAuth2
+└── .env                    # Secrets (API Keys, Models)
 ```
 
 ## 🛠️ Setup & Installation
@@ -73,17 +69,12 @@ langchain_agent/
    - `TAVILY_API_KEY`: For web searching.
    - `GMAIL_TOKEN` & `GMAIL_REFRESH_TOKEN`: OAuth2 credentials.
 
-## 🤖 Usage Example
+## 🔄 Integration Flow Example
 
-**Query**: *"Find the email of Shikha Solankey who works at Databricks from her LinkedIn url [URL] and send her my resume."*
-
-**JARVIS Execution Flow**:
-1. Extracts "Shikha Solankey" and "Databricks" from the query/URL.
-2. Uses `web_search` to find the `databricks.com` domain.
-3. Calls `find_email` via Hunter.io to get the verified address.
-4. Loads the resume template and attaches the local PDF.
-5. Fetches your Gmail signature.
-6. Sends the email and confirms the **Message ID** and status to you.
+1. **Query**: User provides a high-level task requiring external data.
+2. **Step A (Research)**: Agent uses `web_search` to find domains or identifiers.
+3. **Step B (Discovery)**: Agent uses `find_email` to resolve identities to contact endpoints.
+4. **Step C (Action)**: Agent uses `gmail_send` or `gmail_draft` to finalize the workflow, automatically injecting the user's signature and any requested attachments.
 
 ---
 *Built with ❤️ for Advanced Agentic Coding.*

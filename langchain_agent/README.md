@@ -42,7 +42,7 @@ langchain_agent/
 │   ├── template.py         # Email body/subject templates
 │   └── Sanskar_Suri_Resume.pdf # Default attachment
 ├── agent.py                # Agent initialization & tool binding
-├── main.py                 # FastAPI app & CLI entry point
+├── main.py                 # FastAPI app
 ├── config.py               # Env var management
 └── .env                    # Secrets (API Keys, Models)
 ```
@@ -71,10 +71,20 @@ langchain_agent/
 
 ## 🔄 Integration Flow Example
 
-1. **Query**: User provides a high-level task requiring external data.
+1. **Query**: User provides a high-level task requiring external data on telegram bot which acts as client.
 2. **Step A (Research)**: Agent uses `web_search` to find domains or identifiers.
 3. **Step B (Discovery)**: Agent uses `find_email` to resolve identities to contact endpoints.
 4. **Step C (Action)**: Agent uses `gmail_send` or `gmail_draft` to finalize the workflow, automatically injecting the user's signature and any requested attachments.
+
+## **Inference Examples**
+
+<img width="1044" height="893" alt="image" src="https://github.com/user-attachments/assets/a6ee2664-14b3-4337-9105-1a6e43c45659" />
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+<img width="715" height="252" alt="image" src="https://github.com/user-attachments/assets/31820609-c0b4-43b5-a19a-4528a5a21202" />
+
+
 
 ---
 *Built with ❤️ for Advanced Agentic Coding.*

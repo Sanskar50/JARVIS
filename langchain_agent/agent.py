@@ -125,5 +125,48 @@ agent = create_agent(
 def ask_agent(user_input: str) -> str:
     """Gets a response from the JARVIS agent for the given input."""
     res = agent.invoke({"messages": [("user", user_input)]})
+
+    tool_calls = []
+    for msg in res.get("messages", []):
+        if hasattr(msg, "tool_calls") and msg.tool_calls:
+            for tc in msg.tool_calls:
+                tool_calls.append(f"Tool: {tc['name']}, Args: {tc['args']}")
+        elif (
+            hasattr(msg, "additional_kwargs") and "tool_calls" in msg.additional_kwargs
+        ):
+            for tc in msg.additional_kwargs["tool_calls"]:
+                function_info = tc.get("function", {})
+                tool_calls.append(
+                    f"Tool: {function_info.get('name')}, Args: {function_info.get('arguments')}"
+                )
+
+    if tool_calls:
+        print("\n--- Tool Calls Made in Sequence ---")
+        for i, tc in enumerate(tool_calls, 1):
+            print(f"{i}. {tc}")
+        print("-----------------------------------\n")
+    else:
+        print("\n--- No Tool Calls Made ---\n")
+
     ai_message = res["messages"][-1].content
-    return ai_message[0]["text"]
+    if (
+        isinstance(ai_message, list)
+        and len(ai_message) > 0
+        and isinstance(ai_message[0], dict)
+        and "text" in ai_message[0]
+    ):
+        response_text = ai_message[0]["text"]
+    elif isinstance(ai_message, str):
+        response_text = ai_message
+    else:
+        response_text = str(ai_message)
+
+    if tool_calls:
+        tool_sequence_str = "\n\n**Tool Calls Made in Sequence:**\n" + "\n".join(
+            f"{i}. {tc}" for i, tc in enumerate(tool_calls, 1)
+        )
+        response_text += tool_sequence_str
+    else:
+        response_text += "\n\n**Tool Calls Made in Sequence:**\nNone"
+
+    return response_text

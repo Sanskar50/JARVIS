@@ -40,7 +40,7 @@ def test_run():
 
 
 if __name__ == "__main__":
-    # if os.getenv("TEST_MODE","true") == "true":
+    # if os.getenv("TEST_MODE", "true") == "true":
     #     test_run()
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

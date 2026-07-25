@@ -1,6 +1,10 @@
 import base64
 import re
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -21,13 +25,12 @@ SCOPES = [
 
 def get_gmail_service():
     """Helper to get an authorized Gmail API service instance."""
-    token = config.GMAIL_TOKEN if config.GMAIL_TOKEN else None
     refresh_token = config.GMAIL_REFRESH_TOKEN if config.GMAIL_REFRESH_TOKEN else None
     client_id = config.GMAIL_CLIENT_ID if config.GMAIL_CLIENT_ID else None
     client_secret = config.GMAIL_CLIENT_SECRET if config.GMAIL_CLIENT_SECRET else None
 
     creds = Credentials(
-        token=token,
+        token=None,
         refresh_token=refresh_token,
         token_uri="https://oauth2.googleapis.com/token",
         client_id=client_id,
@@ -49,6 +52,7 @@ def gmail_read(max_results: int = 20):
     List the user's most recent emails.
     Returns: A list of dicts with subject and snippet.
     """
+    logger.info(f"gmail_read called with: max_results={max_results}")
     try:
         service = get_gmail_service()
         results = (
@@ -80,10 +84,13 @@ def gmail_read(max_results: int = 20):
                     "snippet": txt.get("snippet", ""),
                 }
             )
+        logger.info(f"gmail_read returned {len(email_data)} emails")
         return email_data
     except HttpError as error:
+        logger.error(f"gmail_read error: {error}")
         return f"An error occurred: {error}"
-    except RefreshError:
+    except RefreshError as error:
+        logger.error(f"gmail_read RefreshError: {error}")
         return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
@@ -91,6 +98,7 @@ def gmail_send(to: str, subject: str, body: str):
     """
     Send an email message.
     """
+    logger.info(f"gmail_send called with: to='{to}', subject='{subject}'")
     try:
         service = get_gmail_service()
         message = EmailMessage()
@@ -106,10 +114,14 @@ def gmail_send(to: str, subject: str, body: str):
         send_message = (
             service.users().messages().send(userId="me", body=create_message).execute()
         )
-        return f'Message Id: {send_message["id"]} sent successfully.'
+        result = f'Message Id: {send_message["id"]} sent successfully.'
+        logger.info(f"gmail_send result: {result}")
+        return result
     except HttpError as error:
+        logger.error(f"gmail_send error: {error}")
         return f"An error occurred: {error}"
-    except RefreshError:
+    except RefreshError as error:
+        logger.error(f"gmail_send RefreshError: {error}")
         return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
@@ -117,6 +129,7 @@ def gmail_send_with_resume(to: str, company_name: str, first_name: str):
     """
     Send an email with the resume attached using the predefined template.
     """
+    logger.info(f"gmail_send_with_resume called with: to='{to}', company_name='{company_name}', first_name='{first_name}'")
     try:
         service = get_gmail_service()
         send_as_results = (
@@ -174,10 +187,14 @@ def gmail_send_with_resume(to: str, company_name: str, first_name: str):
         send_message = (
             service.users().messages().send(userId="me", body=create_message).execute()
         )
-        return f'Message Id: {send_message["id"]} sent successfully with resume.'
+        result = f'Message Id: {send_message["id"]} sent successfully with resume.'
+        logger.info(f"gmail_send_with_resume result: {result}")
+        return result
     except HttpError as error:
+        logger.error(f"gmail_send_with_resume error: {error}")
         return f"An error occurred: {error}"
-    except RefreshError:
+    except RefreshError as error:
+        logger.error(f"gmail_send_with_resume RefreshError: {error}")
         return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
@@ -185,6 +202,7 @@ def gmail_draft(to: str, subject: str, body: str):
     """
     Create a draft email.
     """
+    logger.info(f"gmail_draft called with: to='{to}', subject='{subject}'")
     try:
         service = get_gmail_service()
         message = EmailMessage()
@@ -200,10 +218,14 @@ def gmail_draft(to: str, subject: str, body: str):
         draft = (
             service.users().drafts().create(userId="me", body=create_draft).execute()
         )
-        return f'Draft Id: {draft["id"]} created successfully.'
+        result = f'Draft Id: {draft["id"]} created successfully.'
+        logger.info(f"gmail_draft result: {result}")
+        return result
     except HttpError as error:
+        logger.error(f"gmail_draft error: {error}")
         return f"An error occurred: {error}"
-    except RefreshError:
+    except RefreshError as error:
+        logger.error(f"gmail_draft RefreshError: {error}")
         return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
@@ -212,6 +234,7 @@ def gmail_read_by_label(label_id: str, max_results: int = 20):
     List the user's emails from a specific label (e.g., 'IMPORTANT', 'SENT', 'INBOX').
     Returns: A list of dicts with subject and snippet.
     """
+    logger.info(f"gmail_read_by_label called with: label_id='{label_id}', max_results={max_results}")
     try:
         service = get_gmail_service()
         results = (
@@ -243,10 +266,13 @@ def gmail_read_by_label(label_id: str, max_results: int = 20):
                     "snippet": txt.get("snippet", ""),
                 }
             )
+        logger.info(f"gmail_read_by_label returned {len(email_data)} emails")
         return email_data
     except HttpError as error:
+        logger.error(f"gmail_read_by_label error: {error}")
         return f"An error occurred: {error}"
-    except RefreshError:
+    except RefreshError as error:
+        logger.error(f"gmail_read_by_label RefreshError: {error}")
         return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."
 
 
@@ -254,6 +280,7 @@ def gmail_get_email_addresses(max_results: int = 20):
     """
     Extract unique email addresses from the most recent emails.
     """
+    logger.info(f"gmail_get_email_addresses called with: max_results={max_results}")
     try:
         service = get_gmail_service()
         results = (
@@ -282,8 +309,12 @@ def gmail_get_email_addresses(max_results: int = 20):
             for addr in found:
                 addresses.add(addr)
 
-        return list(addresses)
+        result = list(addresses)
+        logger.info(f"gmail_get_email_addresses returned {len(result)} email addresses")
+        return result
     except HttpError as error:
+        logger.error(f"gmail_get_email_addresses error: {error}")
         return f"An error occurred: {error}"
-    except RefreshError:
+    except RefreshError as error:
+        logger.error(f"gmail_get_email_addresses RefreshError: {error}")
         return "Gmail Authentication Error: Your token has expired or been revoked. Please re-authenticate."

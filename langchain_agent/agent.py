@@ -13,6 +13,7 @@ from tools.gmail import (
 )
 from tools.web_search import web_search as run_web_search
 from tools.find_email import find_email as run_find_email
+from tools.find_domain import find_domain as run_find_domain
 
 # Load system prompt from file
 prompt_path = os.path.join(os.path.dirname(__file__), "prompts", "system_prompt.txt")
@@ -92,6 +93,15 @@ def get_email_addresses(max_results: int = 20):
     return gmail_get_email_addresses(max_results)
 
 
+@tool
+def find_domain(company_name: str):
+    """
+    Find company names and domains matching the given company name query.
+    Returns: A list of dicts with company name and domain.
+    """
+    return run_find_domain(company_name)
+
+
 model = ChatGoogleGenerativeAI(
     model=config.GEMINI_MODEL_NAME,
     google_api_key=config.GEMINI_API_KEY,
@@ -117,6 +127,7 @@ agent = create_agent(
         get_email_addresses,
         find_email,
         send_email_with_resume,
+        find_domain,
     ],
     system_prompt=system_prompt,
 )

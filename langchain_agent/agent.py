@@ -14,6 +14,7 @@ from tools.gmail import (
 from tools.web_search import web_search as run_web_search
 from tools.find_email import find_email as run_find_email
 from tools.find_domain import find_domain as run_find_domain
+from tools.generate_resume import generate_resume as run_generate_resume
 
 # Load system prompt from file
 prompt_path = os.path.join(os.path.dirname(__file__), "prompts", "system_prompt.txt")
@@ -102,6 +103,20 @@ def find_domain(company_name: str):
     return run_find_domain(company_name)
 
 
+@tool
+def generate_resume(job_description: str, chat_id: int = 0):
+    """
+    Generate a tailored resume PDF from the base LaTeX template.
+    Modifies only the editable sections (Experience, Projects, Skills, Achievements)
+    based on the job_description. Compiles to PDF and uploads to Telegram if chat_id is provided.
+    Args:
+        job_description: Description of the target role or specific changes to apply to the resume.
+        chat_id: Optional Telegram chat_id to upload the generated PDF (0 means skip).
+    Returns: dict with tex_path, pdf_path, telegram_sent.
+    """
+    return run_generate_resume(job_description, chat_id)
+
+
 model = ChatGoogleGenerativeAI(
     model=config.GEMINI_MODEL_NAME,
     google_api_key=config.GEMINI_API_KEY,
@@ -128,14 +143,15 @@ agent = create_agent(
         find_email,
         send_email_with_resume,
         find_domain,
+        generate_resume,
     ],
     system_prompt=system_prompt,
 )
 
 
-def ask_agent(user_input: str) -> str:
+def ask_agent(user_input: str, chat_id: int = 0) -> str:
     """Gets a response from the JARVIS agent for the given input."""
-    res = agent.invoke({"messages": [("user", user_input)]})
+    res = agent.invoke({"messages": [("user", user_input)], "chat_id": chat_id})
 
     tool_calls = []
     for msg in res.get("messages", []):

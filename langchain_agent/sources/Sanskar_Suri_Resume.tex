@@ -1,0 +1,313 @@
+%-------------------------
+% Resume in Latex
+% Author : Jake Gutierrez
+% Based off of: https://github.com/sb2nov/resume
+% License : MIT
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome}
+\usepackage{multicol}
+\setlength{\multicolsep}{-3.0pt}
+\setlength{\columnsep}{-1pt}
+\input{glyphtounicode}
+
+
+%----------FONT OPTIONS----------
+% sans-serif
+% \usepackage[sfdefault]{FiraSans}
+% \usepackage[sfdefault]{roboto}
+% \usepackage[sfdefault]{noto-sans}
+% \usepackage[default]{sourcesanspro}
+
+% serif
+% \usepackage{CormorantGaramond}
+% \usepackage{charter}
+
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1.19in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+% Ensure that generate pdf is machine readable/ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\classesList}[4]{
+    \item\small{
+        {#1 #2 #3 #4 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & \textbf{\small #2} \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{1.001\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & \textbf{\small #2}\\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.0in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+%----------HEADING----------
+% \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+%   \textbf{\href{http://sourabhbajaj.com/}{\Large Sourabh Bajaj}} & Email : \href{mailto:sourabh@sourabhbajaj.com}{sourabh@sourabhbajaj.com}\\
+%   \href{http://sourabhbajaj.com/}{http://www.sourabhbajaj.com} & Mobile : +1-123-456-7890 \\
+% \end{tabular*}
+
+\begin{center}
+    {\Huge \scshape Sanskar Suri} \\ \vspace{1pt}
+    {\normalsize\faPhone {+91 9140033172}\\  \vspace{1pt}
+    \href{mailto:x@gmail.com}{\raisebox{-0.2\height}\faEnvelope\  \underline{sanskarsuri50@gmail.com}} ~ 
+    \href{https://linkedin.com/in/sanskar-suri-882069228/}{\raisebox{-0.2\height}\faLinkedin\ \underline{linkedin.com/sanskar-suri/}}  ~
+    \href{https://github.com/Sanskar50}{\raisebox{-0.2\height}\faGithub\ \underline{github.com/Sanskar50}}
+     \hspace{1pt}
+    \small \href{https://leetcode.com/u/sanskar50/} {\raisebox{-0.1\height}\faCode\
+    \underline{leetcode.com/sanskar50/}} 
+    \vspace{-8pt}
+\end{center}
+
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Indian Institute of Information Technology, Dharwad}{Jul. 2021 -- Jul. 2025}
+      {B.Tech in Electronics and Communication Engineering [ CGPA : 8.67 ]}{Hubli-Dharwad, Karnataka}
+        \vspace{-8pt}
+  \resumeSubHeadingListEnd
+
+
+% %------RELEVANT COURSEWORK-------
+% \section{Relevant Coursework}
+%     %\resumeSubHeadingListStart
+%         \begin{multicols}{4}
+%             \begin{itemize}[itemsep=-5pt, parsep=3pt]
+%                 \item\small Data Structures
+%                 % \item Digital Design
+%                 \item Algorithms
+%                  \item Machine Learning
+%                 % \item Signals and Systems
+%                 \item Generative AI
+%                 \item DevOps
+%                 \item Embedded Systems
+%                 \item Microcontrollers
+%                 \item Digital Signal Processing
+%             \end{itemize}
+%         \end{multicols}
+%         \vspace*{2.0\multicolsep}
+%     %\resumeSubHeadingListEnd
+
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+    \resumeSubheading
+      {Needl.ai}{Aug 2025 -- Present}
+      {Software Engineer, Platforms Team}{Bangalore, Karnataka}
+      \resumeItemListStart
+        \resumeItem{Architected and scaled distributed \textbf{public crawlers, LLM-based scraping pipelines}, and \textbf{custom spiders with robust proxy integration} for reliable, geo-distributed web data extraction.}
+        \resumeItem{Engineered high-throughput \textbf{ingestors and transformation pipelines} for efficient data indexing, normalization, and downstream data consumption.}
+        \resumeItem{Strengthened \textbf{API reliability by implementing guardrails, schema validations, unit tests, and live API testing} to ensure data integrity and fault tolerance.}
+        \resumeItem{Enhanced observability and operational stability by integrating \textbf{prometheus and opentelemetry for metrics}, tracing, and performance monitoring.}
+      \resumeItemListEnd
+    \resumeSubheading
+      {Needl.ai}{Dec 2024 -- July 2025}
+      {Software Engineer Intern, Platforms Team}{Bangalore, Karnataka}
+      \resumeItemListStart
+        \resumeItem{Contributed to \textbf{crawlers and data transformation pipelines}, improving extraction accuracy and pipeline efficiency.}
+        \resumeItem{\textbf{Data migrations and one-time patch scripts} to support production data fixes and indexing improvements.}
+      \resumeItemListEnd
+    \resumeSubheading
+      {Fleeter}{July 2024 -- August 2024}
+      {Software Development Engineer Intern}{Remote}
+      \resumeItemListStart
+        \resumeItem{Worked on robust \textbf{backend systems for Client and Partner Portals}, improving operational efficiency.}
+        \resumeItem{Migrated landing page to \textbf{NextJS} to enhance \textbf{SEO} and overall user experience.}
+        \resumeItem{Integrated \textbf{CMS tools}, streamlining client management workflows.}
+      \resumeItemListEnd
+  \vspace{-6pt}
+  \resumeSubHeadingListEnd
+%-----------PROJECTS-----------
+\section{Projects}
+  \resumeSubHeadingListStart
+   \resumeProjectHeading
+        {\textbf{Pulse Bengaluru} \hspace{8pt}
+        \href{https://github.com/Sanskar50/Autopilots-PULSE-Bengaluru/blob/main/README.md}{\faExternalLink}
+        $|$ \emph{Python, FastAPI, Flask, Firebase, Google Gemini}}{}
+    \resumeItemListStart
+    \resumeItem{Developed an \textbf{urban monitoring platform} with \textbf{real-time reporting system} using \textbf{FastAPI} backend and \textbf{Firebase Realtime Database}, enabling citizens to \textbf{submit geo-tagged incident} reports with media attachments.}
+    \resumeItem{Engineered a \textbf{multi-source data aggregation pipeline} that processes information from \textbf{traffic news}, \textbf{social media reports}, and \textbf{local news articles using crawlers} to generate actionable insights for residents.}
+    \resumeItem{Developed intelligent \textbf{PULSE} and \textbf{FORCAST Agents} using \textbf {Gemini} to analyze cross-platform data, generate \textbf{contextualized alerts} for 8+ categories of urban incidents.}
+
+    % \resumeItem{Implemented an intelligent \textbf{PULSE Agent} using \textbf{Google Gemini 2.5 Flash Model} that analyzes cross-platform data and generates \textbf{contextualized alerts} with 8+ categories of urban incident.}
+    % \resumeItem{Implemented a \textbf{FORCAST Agent} that forecasts urban activity patterns based on upcoming events, providing \textbf{location-specific predictions} for traffic conditions, crowd density, and public service demand across the city.}
+    \resumeItemListEnd
+
+      \vspace{-15pt}
+
+   \resumeProjectHeading
+{\textbf{Agentic AI Automation Agent} \hspace{8pt} \href{https://github.com/Sanskar50/JARVIS/blob/langchain_agent/langchain_agent/README.md}{\faExternalLink}
+$|$ \emph{FastAPI, LangChain, Gemini, OAuth2, Gmail API, Tavily, Hunter.io}}{}
+\resumeItemListStart
+  \resumeItem{Designed a modular \textbf{agentic AI orchestration framework} enabling autonomous multi-step workflow execution , integrating \textbf{Gmail}, \textbf{Web search} and \textbf{Hunter API} to search professional emails }
+  
+  \resumeItem{Built a resilient \textbf{LLM routing and reasoning pipeline} with \textbf{dynamic prompt orchestration}, automated model failover, \textbf{adaptive tool selection} to maintain high availability during rate limits and external service failures.}
+  
+  \resumeItem{Implemented secure \textbf{OAuth2 lifecycle management}, intelligent \textbf{email automation} with dynamic MIME generation, \textbf{attachment handling, and real-time professional signature injection}, enabling personalized outreach workflow }
+\resumeItemListEnd
+          
+   \vspace{-10pt}
+
+    % \resumeProjectHeading
+    %   {\textbf{Vitals Monitoring System} \hspace{4pt}
+    %   \href{https://github.com/Sanskar50/Vitals-Monitoring-System/blob/main/README.md}{\faGithub}
+    %   $|$ \emph{Nodejs, Express, Firebase}}{}
+    %   \resumeItemListStart
+    %     \resumeItem{Real-time patient vitals monitoring with live updates from \textbf{Firebase Realtime Database}.}
+    %     \resumeItem{Sensor data transferred to \textbf{NodeJs backend server} using \textbf{UDP} protocol code running on microcontroller.}
+    %     \resumeItem{Integrated pre-trained \textbf{roBERTa ML model} to provide \textbf{recommendations} based on patient vitals.}
+    %     \resumeItem{Customized alert messages sent to patient mobiles based on preset limits using \textbf{Twilio API}.}
+    %   \resumeItemListEnd
+          
+% \resumeProjectHeading
+%       {\textbf{Trader Bot API} \hspace{4pt}
+%       \href{https://github.com/Sanskar50/Trading-Bot-API/blob/main/README.md}{\faGithub}
+%       $|$ \emph{Nodejs, MongoDB, Mongoose}}{}
+%       \resumeItemListStart
+%         \resumeItem{Simulated \textbf{real-time stock price} updates 
+%         using local   \textbf{JSON}, with Mongoose schemas and MongoDB as the database.}
+%         \resumeItem{Added endpoints for retrieving stock lists, price history, and adding/updating stocks.}
+%         \resumeItem{Implemented \textbf{Node Cron Scheduler} for periodic stock price updates and execution of \textbf{trading strategies}.}
+%       \resumeItemListEnd
+ 
+    \vspace{-2pt}
+            
+      % \resumeProjectHeading
+      %     {\textbf{Footwear Ecommerce Website} $|$ \emph{React, Nodejs , MongoDB , Mongoose}}{\href{https://github.com/Sanskar50/Footwear-ecom}{Repo Link}}
+      %     \resumeItemListStart
+      %           \resumeItem{ \textbf{CRUD} operations for cart items with  \textbf{React} components and  \textbf{MongoDB} Database using  \textbf{Mongoose schemas}.}
+      %       \resumeItem{Implemented  \textbf{JWT authentication} for secure access and session management.}
+      %       \resumeItem{Created  \textbf{Docker} files for containerizing and deploying the application.}
+      %     \resumeItemListEnd 
+          % \vspace{-13pt}
+          % \resumeProjectHeading
+          % {\textbf{Crypto API} $|$ \emph{Nodejs , Express , MongoDB}}{\href{https://github.com/Sanskar50/CryptoAPI}{Repo Link}}
+          % \resumeItemListStart
+          %   \resumeItem{Developed a  \textbf{REST API} to display  \textbf{Ethereum} transactions for users and calculate total expenses.}
+          %   \resumeItem{Integrated a   \textbf{node-cron scheduler} to update Ethereum prices in the database every 10 minutes.}
+          %   \resumeItem{Calculated expenses based on the latest Ethereum price for accurate reporting.}
+          % \resumeItemListEnd
+          
+    \resumeSubHeadingListEnd
+\vspace{-3pt}
+
+
+%
+%-----------PROGRAMMING SKILLS-----------
+\section*{Technical Skills}
+\begin{itemize}
+    \setlength\itemsep{-0.3em} % Reduce space between items
+    
+    \item Proficient in C, C++, Python programming with Data structures algorithms and OOPS.
+    
+     % \item Proficient knowledge on Computer Networks , Analog and Digital Communication , Embedded System design and Software development lifecycle.
+
+     % \item Proficient knowledge on Computer Networks ,Unix/Linux commands and SDLC.
+
+     \item Strong foundation in Operating Systems and Database Management Systems.
+    
+    \item Backend Technologies: Flask, Node-Js, Express, Postgres, MongoDB
+
+    \item Tools : AWS , Docker , Kubernates , Postman , Copilot , MCPs
+    
+    % \item Learning Machine learning concepts.
+\end{itemize}
+\vspace{-10pt}
+
+%-----------INVOLVEMENT---------------
+\section{Achievements}
+    \begin{itemize}
+    
+    \setlength\itemsep{-0.3em} % Reduce space between items
+
+    \item Selected for \textbf{onsite round of Google Agentic AI Day Hackathon from 9000+} teams.
+
+    \item \textbf{Open Source Contributor in SSOC }(Social Summer of Code-2022) organized by Social Foundation.
+
+    \item\textbf{Solved 350+ DSA Questions} on Leetcode platform.
+    % \item \textbf{Participated in 50+ contests} on Codechef Platfrom.\href{https://www.codechef.com/users/sanskar50}{\footnotesize CodeChef ID}
+
+    \item \textbf{Problem Setter} in Technical Team of Coding Club at IIIT Dharwad
+\end{itemize}
+
+
+\end{document}

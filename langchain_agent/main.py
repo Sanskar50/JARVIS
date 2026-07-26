@@ -1,7 +1,7 @@
 import os
 import uvicorn
 import logging
-from telegram_webhook import telegram_webhook, send_message
+from telegram_utils import telegram_webhook, send_message
 from agent import ask_agent
 from fastapi import FastAPI, Request
 
@@ -17,7 +17,7 @@ async def agent_handler(req: Request):
     """Entry point for incoming Telegram webhook requests."""
     chat_id, text = await telegram_webhook(req)
     logger.info(f"chat_id is {chat_id} and text is {text}")
-    response = ask_agent(text)
+    response = ask_agent(text, chat_id=chat_id)
     logger.info(f"response is {response}")
     await send_message(chat_id, response)
     return {"ok": True}

@@ -2,10 +2,9 @@ import os
 import re
 import logging
 import subprocess
-import httpx
 import shutil
 
-import google.generativeai as genai
+from google import genai
 from config import config
 
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +16,11 @@ TEMPLATE_TEX = os.path.join(_SOURCES_DIR, "Sanskar_Suri_Resume.tex")
 OUTPUT_DIR = os.path.join(_SOURCES_DIR, "output")
 OUTPUT_TEX = os.path.join(OUTPUT_DIR, "resume.tex")
 OUTPUT_PDF = os.path.join(OUTPUT_DIR, "resume.pdf")
+prompt_path = os.path.join(
+    os.path.dirname(__file__), "prompts", "update_resume_prompt.txt"
+)
+with open(prompt_path, "r", encoding="utf-8") as f:
+    update_resume_prompt = f.read().strip()
 
 # ── Section markers ─────────────────────────────────────────────────────────
 _EDITABLE_SECTIONS = [
@@ -68,12 +72,13 @@ def ensure_pdflatex():
     try:
         subprocess.run(
             [
-                "sudo",
                 "apt-get",
                 "install",
                 "-y",
                 "texlive-latex-base",
                 "texlive-latex-extra",
+                "texlive-fonts-extra",
+                "texlive-fonts-recommended",
             ],
             check=True,
         )
@@ -90,7 +95,12 @@ def _compile_to_pdf(tex_path: str, output_dir: str) -> bool:
         logger.error("pdflatex is unavailable.")
         return False
 
-    for _ in range(2):
+    pdf_path = os.path.join(
+        output_dir,
+        os.path.splitext(os.path.basename(tex_path))[0] + ".pdf",
+    )
+
+    for i in range(2):
         result = subprocess.run(
             [
                 "pdflatex",
@@ -105,47 +115,29 @@ def _compile_to_pdf(tex_path: str, output_dir: str) -> bool:
         )
 
         if result.returncode != 0:
-            logger.error(
-                f"pdflatex failed:\n{result.stdout[-2000:]}\n{result.stderr[-1000:]}"
-            )
-            return False
+            # pdflatex may still produce a PDF despite non-zero exit (font warnings, etc.)
+            if os.path.exists(pdf_path):
+                logger.warning(
+                    f"pdflatex pass {i+1} exited non-zero but PDF was produced (likely warnings only)."
+                )
+            else:
+                logger.error(
+                    f"pdflatex pass {i+1} failed — no PDF produced:\n{result.stdout[-2000:]}\n{result.stderr[-1000:]}"
+                )
+                return False
 
-    return True
-
-
-def _send_file_to_telegram_sync(chat_id: int, file_path: str, caption: str = ""):
-    """Synchronous helper – uses httpx directly, no asyncio needed."""
-    bot_token = config.TELEGRAM_BOT_TOKEN
-    url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
-    filename = os.path.basename(file_path)
-    with open(file_path, "rb") as f:
-        file_bytes = f.read()
-    mime = "application/pdf" if file_path.endswith(".pdf") else "application/x-tex"
-    resp = httpx.post(
-        url,
-        data={"chat_id": chat_id, "caption": caption},
-        files={"document": (filename, file_bytes, mime)},
-        timeout=30,
-    )
-    if resp.status_code == 200:
-        logger.info(f"Telegram upload OK: {filename}")
-    else:
-        logger.error(f"Telegram upload failed: {resp.status_code} {resp.text[:300]}")
-    return resp.status_code == 200
+    return os.path.exists(pdf_path)
 
 
 # ── Main public function ─────────────────────────────────────────────────────
 
 
-def generate_resume(job_description: str, chat_id: int = 0) -> dict:
+def generate_resume(job_description: str) -> dict:
     """
     Modify the LaTeX resume for a given job description and compile to PDF.
 
-    Args:
-        chat_id: Telegram chat_id to upload the generated PDF (default: 0).
-
     Returns:
-        dict with tex_path, pdf_path, telegram_sent.
+        dict with tex_path and pdf_path.
     """
 
     # 1. Read template
@@ -153,29 +145,17 @@ def generate_resume(job_description: str, chat_id: int = 0) -> dict:
     editable = _extract_editable(original_tex)
 
     # 2. Ask Gemini to rewrite only editable sections
-    genai.configure(api_key=config.GEMINI_API_KEY)
-    llm = genai.GenerativeModel(
-        model_name=config.GEMINI_MODEL_NAME or "gemini-2.0-flash",
-    )
+    client = genai.Client(api_key=config.GEMINI_API_KEY)
+    model = config.GEMINI_MODEL_NAME
 
-    prompt = f"""You are an expert resume writer. Below are the EDITABLE LaTeX sections of a resume.
-Rewrite ONLY these sections to better match the following job description / instructions.
+    prompt = f"""{update_resume_prompt}
+                JOB DESCRIPTION / INSTRUCTIONS:
+                {job_description}
+                EDITABLE SECTIONS:
+                {editable}
+                """
 
-STRICT RULES:
-- Preserve every LaTeX command, macro, and formatting exactly (\\resumeItem, \\resumeSubheading, \\resumeProjectHeading, etc.).
-- Do NOT change any personal information (name, email, phone, LinkedIn, GitHub).
-- Do NOT add or remove \\section headings.
-- Do NOT alter the preamble, packages, or document structure.
-- Return ONLY the rewritten LaTeX sections — no markdown fences, no explanations.
-
-JOB DESCRIPTION / INSTRUCTIONS:
-{job_description}
-
-EDITABLE SECTIONS:
-{editable}
-"""
-
-    response = llm.generate_content(prompt)
+    response = client.models.generate_content(model=model, contents=prompt)
     new_sections = response.text.strip()
 
     # Strip accidental markdown fences
@@ -205,19 +185,9 @@ EDITABLE SECTIONS:
     except Exception as e:
         logger.error(f"pdflatex unexpected error: {e}")
 
-    telegram_sent = False
-    upload_path = pdf_path if pdf_path else OUTPUT_TEX
-    upload_caption = (
-        "📄 Your tailored resume is ready!"
-        if pdf_path
-        else "⚠️ PDF compilation unavailable — here is the .tex source. Compile with pdflatex to get the PDF."
-    )
-    telegram_sent = _send_file_to_telegram_sync(chat_id, upload_path, upload_caption)
-
     result = {
         "tex_path": OUTPUT_TEX,
-        "pdf_path": pdf_path or "PDF compilation skipped (pdflatex not installed).",
-        "telegram_sent": telegram_sent,
+        "pdf_path": pdf_path,
     }
     logger.info(f"generate_resume result: {result}")
     return result

@@ -15,6 +15,7 @@ from tools.web_search import web_search as run_web_search
 from tools.find_email import find_email as run_find_email
 from tools.find_domain import find_domain as run_find_domain
 from tools.generate_resume import generate_resume as run_generate_resume
+from telegram_utils import send_message_sync, upload_document_sync
 
 # Load system prompt from file
 prompt_path = os.path.join(os.path.dirname(__file__), "prompts", "system_prompt.txt")
@@ -104,17 +105,42 @@ def find_domain(company_name: str):
 
 
 @tool
-def generate_resume(job_description: str, chat_id: int = 0):
+def generate_resume(job_description: str):
     """
     Generate a tailored resume PDF from the base LaTeX template.
     Modifies only the editable sections (Experience, Projects, Skills, Achievements)
-    based on the job_description. Compiles to PDF and uploads to Telegram if chat_id is provided.
+    based on the job_description and compiles to PDF.
     Args:
         job_description: Description of the target role or specific changes to apply to the resume.
-        chat_id: Optional Telegram chat_id to upload the generated PDF (0 means skip).
-    Returns: dict with tex_path, pdf_path, telegram_sent.
+    Returns: dict with tex_path and pdf_path (pdf_path is None if compilation failed).
     """
-    return run_generate_resume(job_description, chat_id)
+    return run_generate_resume(job_description)
+
+
+@tool
+def send_telegram_message(chat_id: int, text: str):
+    """
+    Send a plain-text message to a Telegram chat.
+    Args:
+        chat_id: The Telegram chat ID to send the message to (available from context).
+        text: The message text to send.
+    Returns: True if sent successfully, False otherwise.
+    """
+    return send_message_sync(chat_id, text)
+
+
+@tool
+def upload_to_telegram(chat_id: int, file_path: str, caption: str = ""):
+    """
+    Upload a file (PDF, document, etc.) to a Telegram chat.
+    Use this after generate_resume to send the PDF to the user.
+    Args:
+        chat_id: The Telegram chat ID (available from context).
+        file_path: Absolute path to the file to upload (use pdf_path from generate_resume).
+        caption: Optional caption for the uploaded file.
+    Returns: True if uploaded successfully, False otherwise.
+    """
+    return upload_document_sync(chat_id, file_path, caption)
 
 
 model = ChatGoogleGenerativeAI(
@@ -144,6 +170,8 @@ agent = create_agent(
         send_email_with_resume,
         find_domain,
         generate_resume,
+        send_telegram_message,
+        upload_to_telegram,
     ],
     system_prompt=system_prompt,
 )
@@ -151,7 +179,13 @@ agent = create_agent(
 
 def ask_agent(user_input: str, chat_id: int = 0) -> str:
     """Gets a response from the JARVIS agent for the given input."""
-    res = agent.invoke({"messages": [("user", user_input)], "chat_id": chat_id})
+    # Inject chat_id so the LLM can pass it to send_telegram_message / upload_to_telegram
+    if chat_id:
+        augmented_input = f"[context: chat_id={chat_id}]\n{user_input}"
+    else:
+        augmented_input = user_input
+
+    res = agent.invoke({"messages": [("user", augmented_input)]})
 
     tool_calls = []
     for msg in res.get("messages", []):

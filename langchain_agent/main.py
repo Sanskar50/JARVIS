@@ -1,7 +1,7 @@
 import os
 import uvicorn
 import logging
-from telegram_webhook import telegram_webhook, send_message
+from telegram_utils import telegram_webhook, send_message
 from agent import ask_agent
 from fastapi import FastAPI, Request
 
@@ -16,9 +16,11 @@ app = FastAPI(title="JARVIS LangChain Webhook")
 async def agent_handler(req: Request):
     """Entry point for incoming Telegram webhook requests."""
     chat_id, text = await telegram_webhook(req)
-    logger.info(f"chat_id is {chat_id} and text is {text}")
-    response = ask_agent(text)
-    logger.info(f"response is {response}")
+    logger.info(f"chat_id={chat_id} text={text!r}")
+    response = ask_agent(text, chat_id=chat_id)
+    logger.info(f"agent response: {response}")
+
+    # Send the final text summary back to the user.
     await send_message(chat_id, response)
     return {"ok": True}
 
@@ -30,13 +32,16 @@ async def root():
 
 
 def test_run():
-    """Test the JARVIS agent in an interactive loop."""
+    """Test the JARVIS agent in an interactive CLI loop (no Telegram sends)."""
     print("Welcome to JARVIS Test Mode. Type 'exit' to quit.")
+    print("Note: Telegram sends are skipped in test mode (no chat_id).\n")
     while True:
-        query = input("Enter your query: ")
+        query = input("Enter your query: ").strip()
         if query.lower() in ["exit", "quit", "q"]:
             break
-        print(f"JARVIS: {ask_agent(query)}")
+        if not query:
+            continue
+        print(f"\nJARVIS: {ask_agent(query)}\n")
 
 
 if __name__ == "__main__":

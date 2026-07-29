@@ -68,15 +68,18 @@ def ensure_pdflatex():
     logger.warning("pdflatex not found. Attempting to install TeX Live...")
 
     try:
+        subprocess.run(["apt-get", "update", "-y"], check=True)
         subprocess.run(
             [
                 "apt-get",
                 "install",
                 "-y",
+                "--no-install-recommends",
                 "texlive-latex-base",
                 "texlive-latex-extra",
                 "texlive-fonts-extra",
                 "texlive-fonts-recommended",
+                "texlive-lang-english",
             ],
             check=True,
         )

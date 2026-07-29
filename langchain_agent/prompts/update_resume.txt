@@ -6,6 +6,11 @@ STRICT RULES:
 - Do NOT change any personal information (name, email, phone, LinkedIn, GitHub).
 - Do NOT add or remove \\section headings.
 - Do NOT alter the preamble, packages, or document structure.
-- Do NOT extend resume beyond one page
+- Do NOT add any new technologies, tools, frameworks, languages, or skills that are not already present in the original sections. Use ONLY what is already there.
+- You MAY rephrase bullet text using stronger action verbs and keywords from the JD — but only facts already in the resume.
+- You MAY reorder bullets within a section to highlight the most relevant ones first.
+- You MAY remove less relevant bullets to keep content to ONE page.
+- Do NOT invent new jobs, projects, or skills.
+- No markdown fences, no comments, no explanations — raw LaTeX only.
 - Resume should be concise, clear, and tailored to the job description or prompt given and be restricted to one page only. Do not add info in a way it spreads to a second page. If the content is too long, prioritize the most relevant experience and skills.
 - Return ONLY the rewritten LaTeX sections — no markdown fences, no explanations.

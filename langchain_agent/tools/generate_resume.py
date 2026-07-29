@@ -25,7 +25,7 @@ _EDITABLE_SECTIONS = [
     "Experience",
     "Projects",
     "Technical Skills",
-    "Achivements",  # keep original typo from .tex
+    "Achievements",
 ]
 
 _SECTION_RE = re.compile(
@@ -57,7 +57,15 @@ def _replace_editable(original_tex: str, new_sections: str) -> str:
     prefix = original_tex[: first_match.start()]
     all_matches = list(_SECTION_RE.finditer(original_tex))
     last_match = all_matches[-1]
-    suffix = original_tex[last_match.end() :]
+    suffix = original_tex[last_match.end():]
+
+    # Strip \end{document} from sections in case it was captured by \Z lookahead
+    new_sections = re.sub(r"\\end\{document\}\s*$", "", new_sections).rstrip()
+
+    # Always guarantee the document ends correctly
+    if "\\end{document}" not in suffix:
+        suffix = "\n\n\\end{document}\n"
+
     return prefix + new_sections + suffix
 
 
@@ -138,7 +146,7 @@ def generate_resume(job_description: str) -> dict:
     Modify the LaTeX resume for a given job description and compile to PDF.
 
     Returns:
-        dict with tex_path and pdf_path.
+        dict with tex_path, pdf_path, and changes_summary.
     """
 
     # 1. Read template
@@ -150,18 +158,41 @@ def generate_resume(job_description: str) -> dict:
     model = config.GEMINI_MODEL_NAME
 
     prompt = f"""{update_resume_prompt}
-                JOB DESCRIPTION / INSTRUCTIONS:
-                {job_description}
-                EDITABLE SECTIONS:
-                {editable}
-                """
+    JOB DESCRIPTION / INSTRUCTIONS:
+    {job_description}
+    EDITABLE SECTIONS TO REWRITE:
+    {editable}
+    """
 
-    response = client.models.generate_content(model=model, contents=prompt)
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+        config={"temperature": 0.7},
+    )
     new_sections = response.text.strip()
 
     # Strip accidental markdown fences
     new_sections = re.sub(r"^```[a-z]*\n?", "", new_sections)
     new_sections = re.sub(r"\n?```$", "", new_sections)
+
+    # 2b. Ask Gemini to summarise what actually changed (plain text, not LaTeX)
+    changes_summary = ""
+    try:
+        changelog_prompt = f"""Compare these two versions of resume sections and write a concise plain-text summary of what was changed.
+        ORIGINAL SECTIONS:
+        {editable}
+        UPDATED SECTIONS:
+        {new_sections}
+        Write a short bullet-point summary of the actual changes made (rephrased bullets, reordered items, removed bullets). Be specific — mention which section and what changed. No LaTeX, no markdown headers, plain text only."""
+        changelog_resp = client.models.generate_content(
+            model=model,
+            contents=changelog_prompt,
+            config={"temperature": 0.7},
+        )
+        changes_summary = changelog_resp.text.strip()
+    except Exception as e:
+        logger.warning(f"Failed to generate changes summary: {e}")
+        changes_summary = "Changes summary unavailable."
 
     # 3. Splice back and write .tex
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -189,6 +220,7 @@ def generate_resume(job_description: str) -> dict:
     result = {
         "tex_path": OUTPUT_TEX,
         "pdf_path": pdf_path,
+        "changes_summary": changes_summary,
     }
     logger.info(f"generate_resume result: {result}")
     return result

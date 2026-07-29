@@ -185,7 +185,10 @@ def ask_agent(user_input: str, chat_id: int = 0) -> str:
     else:
         augmented_input = user_input
 
-    res = agent.invoke({"messages": [("user", augmented_input)]})
+    res = agent.invoke(
+        {"messages": [("user", augmented_input)]},
+        config={"recursion_limit": 10},
+    )
 
     tool_calls = []
     for msg in res.get("messages", []):

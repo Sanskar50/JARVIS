@@ -1,9 +1,0 @@
-[phases.setup]
-aptPkgs = [
-  "texlive-latex-base",        # latexsym, color, verbatim, tabularx, multicol
-  "texlive-latex-recommended", # hyperref, fancyhdr, babel, enumitem
-  "texlive-latex-extra",       # fullpage, titlesec
-  "texlive-fonts-recommended", # marvosym
-  "texlive-fonts-extra",       # fontawesome
-  "texlive-lang-english",      # babel-english
-]

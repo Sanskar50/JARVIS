@@ -16,9 +16,7 @@ TEMPLATE_TEX = os.path.join(_SOURCES_DIR, "Sanskar_Suri_Resume.tex")
 OUTPUT_DIR = os.path.join(_SOURCES_DIR, "output")
 OUTPUT_TEX = os.path.join(OUTPUT_DIR, "resume.tex")
 OUTPUT_PDF = os.path.join(OUTPUT_DIR, "resume.pdf")
-prompt_path = os.path.join(
-    os.path.dirname(__file__), "prompts", "update_resume_prompt.txt"
-)
+prompt_path = os.path.join("prompts", "update_resume.txt")
 with open(prompt_path, "r", encoding="utf-8") as f:
     update_resume_prompt = f.read().strip()
 

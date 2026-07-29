@@ -6,5 +6,6 @@ STRICT RULES:
 - Do NOT change any personal information (name, email, phone, LinkedIn, GitHub).
 - Do NOT add or remove \\section headings.
 - Do NOT alter the preamble, packages, or document structure.
+- Do NOT extend resume beyond one page
 - Resume should be concise, clear, and tailored to the job description or prompt given and be restricted to one page only. Do not add info in a way it spreads to a second page. If the content is too long, prioritize the most relevant experience and skills.
 - Return ONLY the rewritten LaTeX sections — no markdown fences, no explanations.
